@@ -22,6 +22,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <meta-data android:name="io.sentry.debug" android:value="true" />
+        <meta-data android:name="io.sentry.dsn" android:value="https://1c9a97ef204d3ab9f3a568620e1d8128@o4510470032654336.ingest.us.sentry.io/4510470034620416" />
         <receiver android:name=".helper.service.pushnotification.PushNotificationBroadcastReceiver"
             android:enabled="false"
             android:exported="false">
