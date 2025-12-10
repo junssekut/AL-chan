@@ -13,11 +13,11 @@ android {
         versionName "2.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        def apikeyPropertiesFile = rootProject.file("apikey.properties")
-        def apikeyProperties = new Properties()
-        apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
-        buildConfigField("String", "YOUTUBE_API_KEY", apikeyProperties['YOUTUBE_API_KEY'])
-        buildConfigField("String", "SPOTIFY_API_KEY", apikeyProperties['SPOTIFY_API_KEY'])
+//        def apikeyPropertiesFile = rootProject.file("apikey.properties")
+//        def apikeyProperties = new Properties()
+//        apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+        buildConfigField("String", "YOUTUBE_API_KEY", "")
+        buildConfigField("String", "SPOTIFY_API_KEY", "")
     }
     signingConfigs {
         debug {
