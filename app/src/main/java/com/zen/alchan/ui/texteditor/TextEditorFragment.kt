@@ -16,6 +16,7 @@ import com.zen.alchan.helper.extensions.show
 import com.zen.alchan.helper.pojo.TextInputSetting
 import com.zen.alchan.helper.utils.DeepLink
 import com.zen.alchan.ui.base.BaseFragment
+import io.sentry.Sentry
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -178,6 +179,7 @@ class TextEditorFragment : BaseFragment<FragmentTextEditorBinding, TextEditorVie
             } else
                 navigation.openWebView(link)
         } catch (e: Exception) {
+            Sentry.captureException(e)
             // do nothing
         }
     }

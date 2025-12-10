@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import com.zen.alchan.helper.Constant
 import io.noties.markwon.*
+import io.sentry.Sentry
 import io.noties.markwon.core.CorePlugin
 import io.noties.markwon.core.CoreProps
 import io.noties.markwon.core.MarkwonTheme
@@ -86,6 +87,7 @@ object MarkdownUtil {
             markdownSetup.setParsedMarkdown(textView, markdown)
             textView.movementMethod = LinkMovementMethod.getInstance()
         } catch (e: Exception) {
+            Sentry.captureException(e)
             textView.text = "Failed to render"
         }
     }
@@ -99,6 +101,7 @@ object MarkdownUtil {
             markdownSetup.setParsedMarkdown(textView, markdown)
             textView.movementMethod = LinkMovementMethod.getInstance()
         } catch (e: Exception) {
+            Sentry.captureException(e)
             textView.text = "Failed to render"
         }
     }

@@ -17,6 +17,7 @@ import com.zen.alchan.helper.service.clipboard.ClipboardService
 import com.zen.alchan.helper.utils.TimeUtil
 import com.zen.alchan.ui.base.BaseViewModel
 import io.reactivex.rxjava3.core.Observable
+import io.sentry.Sentry
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import com.zen.alchan.type.MediaListStatus
@@ -438,6 +439,7 @@ class MediaListViewModel(
         val rowOrder = try {
             ListOrder.values().find { it.value == user.mediaListOptions.rowOrder } ?: ListOrder.TITLE
         } catch (e: IllegalArgumentException) {
+            Sentry.captureException(e)
             ListOrder.TITLE
         }
 

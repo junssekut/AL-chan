@@ -2,6 +2,7 @@ package com.zen.alchan.helper.utils
 
 import com.zen.alchan.data.response.anilist.FuzzyDate
 import com.zen.alchan.type.MediaSeason
+import io.sentry.Sentry
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -106,6 +107,7 @@ object TimeUtil {
             val today = getCurrentTimeInMillis()
             today in fromDate..untilDate
         } catch (e: Exception) {
+            Sentry.captureException(e)
             false
         }
     }

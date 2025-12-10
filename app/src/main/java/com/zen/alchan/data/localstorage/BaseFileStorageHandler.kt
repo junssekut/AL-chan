@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import com.zen.alchan.helper.pojo.NullableItem
 import io.reactivex.rxjava3.core.Observable
+import io.sentry.Sentry
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -48,6 +49,7 @@ abstract class BaseFileStorageHandler(
                     outputStream.write(data.copyOfRange(0, max(0, bytesRead)))
                 }
             } catch (e: Exception) {
+                Sentry.captureException(e)
                 e.printStackTrace()
             } finally {
                 inputStream?.close()
