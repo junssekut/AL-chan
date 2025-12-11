@@ -22,10 +22,25 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <meta-data android:name="io.sentry.logs.enabled" android:value="true" />
         <meta-data android:name="io.sentry.debug" android:value="true" />
         <meta-data android:name="io.sentry.dsn" android:value="${sentryDsn}" />
         <meta-data android:name="io.sentry.traces.sample-rate" android:value="1.0" />
         <meta-data android:name="io.sentry.traces.profiling-sample-rate" android:value="1.0" />
+        <meta-data
+            android:name="io.sentry.traces.profiling.session-sample-rate"
+            android:value="1.0"
+        />
+        <!-- Set profiling lifecycle, can be `manual` (controlled through `Sentry.startProfiler()` and `Sentry.stopProfiler()`) or `trace` (automatically starts and stop a profile whenever a sampled trace starts and finishes) -->
+        <meta-data
+            android:name="io.sentry.traces.profiling.lifecycle"
+            android:value="trace"
+            />
+        <!-- Enable profiling on app start -->
+        <meta-data
+            android:name="io.sentry.traces.profiling.start-on-app-start"
+            android:value="true"
+            />
         <receiver android:name=".helper.service.pushnotification.PushNotificationBroadcastReceiver"
             android:enabled="false"
             android:exported="false">

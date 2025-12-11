@@ -164,7 +164,7 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 
     // Sentry
-    implementation 'io.sentry:sentry-android:7.14.0'
+    implementation 'io.sentry:sentry-android:8.28.0'
 }
 
 apollo {
@@ -172,5 +172,36 @@ apollo {
         packageName.set("com.zen.alchan")
         mapScalar("Json", "java.lang.Object")
         mapScalar("CountryCode", "kotlin.String")
+    }
+}
+
+sentry {
+    // Enables or disables the automatic upload of ProGuard/R8 mapping files
+    autoUploadProguardMapping = true
+
+    // Enables source context, showing code snippets in Sentry (requires auth token)
+    includeSourceContext = true
+
+    // Organization and project slugs for Sentry
+    org = "junskilly"
+    projectName = "alchan"
+
+    // Load auth token from local.properties
+    def localProperties = new Properties()
+    def localPropertiesFile = rootProject.file('local.properties')
+    if (localPropertiesFile.exists()) {
+        localProperties.load(new FileInputStream(localPropertiesFile))
+    }
+    authToken = localProperties.getProperty('SENTRY_AUTH_TOKEN', '')
+    
+    // Upload native symbols for native crashes
+    uploadNativeSymbols = false
+    
+    // Adds source info to events (file, line, etc.)
+    includeNativeSources = false
+    
+    // Automatically instrument app startup and frames
+    tracingInstrumentation {
+        enabled = true
     }
 }

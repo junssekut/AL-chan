@@ -9,3 +9,8 @@ sdk.dir=/Users/user/Library/Android/sdk
 
 # Sentry DSN - Do NOT commit this file to version control
 SENTRY_DSN=https://<PUBLICKEY>@<URL>/<ID>
+
+# Sentry Auth Token for uploading ProGuard mappings and source context
+# Generate at: https://sentry.io/settings/auth-tokens/
+# Required scopes: project:releases, project:write, org:read
+SENTRY_AUTH_TOKEN=
