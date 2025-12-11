@@ -19,6 +19,16 @@ android {
 //        apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
         buildConfigField("String", "YOUTUBE_API_KEY", "\"\"")
         buildConfigField("String", "SPOTIFY_API_KEY", "\"\"")
+
+        // Load Sentry DSN from local.properties
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file('local.properties')
+        if (localPropertiesFile.exists()) {
+            localProperties.load(new FileInputStream(localPropertiesFile))
+        }
+        manifestPlaceholders = [
+            sentryDsn: localProperties.getProperty('SENTRY_DSN', '')
+        ]
     }
     signingConfigs {
         debug {
