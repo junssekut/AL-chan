@@ -2,6 +2,7 @@ package com.zen.alchan.data.localstorage
 
 import android.content.Context
 import com.google.gson.reflect.TypeToken
+import io.sentry.Sentry
 import java.io.*
 import java.lang.reflect.Type
 
@@ -37,6 +38,7 @@ abstract class BaseJsonStorageHandler(
             outputStream = FileOutputStream(targetFile, false)
             outputStream.write(value.toByteArray())
         } catch (e: Exception) {
+            Sentry.captureException(e)
             e.printStackTrace()
         } finally {
             outputStream?.flush()
@@ -58,10 +60,10 @@ abstract class BaseJsonStorageHandler(
             bufferedReader.readLines().forEach {
                 stringBuilder.append(it)
             }
-
             inputStream.close()
             return stringBuilder.toString()
         } catch (e: Exception) {
+            Sentry.captureException(e)
             inputStream?.close()
             return null
         }

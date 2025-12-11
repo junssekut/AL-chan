@@ -33,7 +33,7 @@ fun StudioQuery.Data.convert(): Studio {
                             popularity = it?.node?.popularity ?: 0,
                             favourites = it?.node?.favourites ?: 0,
                             startDate = if (it?.node?.startDate != null)
-                                FuzzyDate(year = it?.node.startDate.year, month = it.node.startDate.month, day = it.node.startDate.day)
+                                FuzzyDate(year = it?.node?.startDate?.year, month = it?.node?.startDate?.month, day = it?.node?.startDate?.day)
                             else
                                 null
                         ),

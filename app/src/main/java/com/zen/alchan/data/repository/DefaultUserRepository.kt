@@ -31,6 +31,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import io.sentry.Sentry
 
 class DefaultUserRepository(
     private val userDataSource: UserDataSource,
@@ -200,13 +201,14 @@ class DefaultUserRepository(
         return Observable.just(userManager.appSetting)
     }
 
-    override fun setAppSetting(newAppSetting: AppSetting?): Observable<Unit> {
+        override fun setAppSetting(newAppSetting: AppSetting?): Observable<Unit> {
         return Observable.create {
             try {
                 userManager.appSetting = newAppSetting ?: AppSetting()
                 it.onNext(Unit)
                 it.onComplete()
             } catch (e: Exception) {
+                Sentry.captureException(e)
                 it.onError(e)
             }
         }
@@ -223,6 +225,7 @@ class DefaultUserRepository(
                 it.onNext(Unit)
                 it.onComplete()
             } catch (e: Exception) {
+                Sentry.captureException(e)
                 it.onError(e)
             }
         }

@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.apollographql.apollo3'
+apply plugin: 'io.sentry.android.gradle'
 
 android {
     compileSdk 34
@@ -13,11 +14,21 @@ android {
         versionName "2.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        def apikeyPropertiesFile = rootProject.file("apikey.properties")
-        def apikeyProperties = new Properties()
-        apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
-        buildConfigField("String", "YOUTUBE_API_KEY", apikeyProperties['YOUTUBE_API_KEY'])
-        buildConfigField("String", "SPOTIFY_API_KEY", apikeyProperties['SPOTIFY_API_KEY'])
+//        def apikeyPropertiesFile = rootProject.file("apikey.properties")
+//        def apikeyProperties = new Properties()
+//        apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+        buildConfigField("String", "YOUTUBE_API_KEY", "\"\"")
+        buildConfigField("String", "SPOTIFY_API_KEY", "\"\"")
+
+        // Load Sentry DSN from local.properties
+        def localProperties = new Properties()
+        def localPropertiesFile = rootProject.file('local.properties')
+        if (localPropertiesFile.exists()) {
+            localProperties.load(new FileInputStream(localPropertiesFile))
+        }
+        manifestPlaceholders = [
+            sentryDsn: localProperties.getProperty('SENTRY_DSN', '')
+        ]
     }
     signingConfigs {
         debug {
@@ -98,7 +109,7 @@ dependencies {
     implementation 'com.jakewharton.rxbinding4:rxbinding:4.0.0'
 
     // LiveData and ViewModel
-    def lifecycle_version = "2.5.1"
+    def lifecycle_version = "2.8.7"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     kapt "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
@@ -134,7 +145,7 @@ dependencies {
 
     // Others
     implementation 'com.jaredrummler:colorpicker:1.1.0'
-    implementation 'com.github.stfalcon-studio:StfalconImageViewer:v1.0.1'
+    implementation 'com.github.stfalcon-studio:StfalconImageViewer:1.0.1'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.27'
     implementation 'com.github.zend10:OverlapImageListView:v1.0.1'
@@ -151,10 +162,15 @@ dependencies {
     implementation "androidx.work:work-rxjava3:$work_version"
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
+
+    // Sentry
+    implementation 'io.sentry:sentry-android:7.14.0'
 }
 
 apollo {
-    packageName.set("com.zen.alchan")
-    mapScalar("Json", "java.lang.Object")
-    mapScalar("CountryCode", "kotlin.String")
+    service("service") {
+        packageName.set("com.zen.alchan")
+        mapScalar("Json", "java.lang.Object")
+        mapScalar("CountryCode", "kotlin.String")
+    }
 }

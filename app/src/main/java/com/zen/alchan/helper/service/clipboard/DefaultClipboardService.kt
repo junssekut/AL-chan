@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import com.zen.alchan.BuildConfig
 import io.reactivex.rxjava3.core.Observable
+import io.sentry.Sentry
 
 class DefaultClipboardService(private val context: Context) : ClipboardService {
 
@@ -17,6 +18,7 @@ class DefaultClipboardService(private val context: Context) : ClipboardService {
                 it.onNext(Unit)
                 it.onComplete()
             } catch (e: Exception) {
+                Sentry.captureException(e)
                 it.onError(e)
             }
         }
