@@ -37,6 +37,13 @@ android {
             keyAlias KEY_ALIAS_DEV
             keyPassword KEY_PASSWORD_DEV
         }
+        release {
+            // For testing - uses debug keystore. Replace with production keystore for release!
+            storeFile file(KEYSTORE_PATH_DEV)
+            storePassword KEYSTORE_PASSWORD_DEV
+            keyAlias KEY_ALIAS_DEV
+            keyPassword KEY_PASSWORD_DEV
+        }
     }
     buildTypes {
         debug {
@@ -47,6 +54,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         release {
+            signingConfig signingConfigs.release
             debuggable false
             shrinkResources true
             minifyEnabled true
@@ -181,6 +189,7 @@ sentry {
 
     // Enables source context, showing code snippets in Sentry (requires auth token)
     includeSourceContext = true
+    autoUploadSourceContext = true
 
     // Organization and project slugs for Sentry
     org = "junskilly"
