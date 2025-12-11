@@ -31,6 +31,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
+import io.sentry.Sentry
 
 class DefaultUserRepository(
     private val userDataSource: UserDataSource,

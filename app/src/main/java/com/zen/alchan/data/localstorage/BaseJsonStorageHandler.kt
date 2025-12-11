@@ -66,7 +66,6 @@ abstract class BaseJsonStorageHandler(
             Sentry.captureException(e)
             inputStream?.close()
             return null
-        }   return null
         }
     }
 }
