@@ -100,10 +100,22 @@ object TimeUtil {
     }
 
     fun isBetweenTwoDates(fromDateString: String, untilDateString: String): Boolean {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US)
+        // Support both "yyyy-MM-dd" and "yyyy-MM-dd hh:mm:ss" formats
+        val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+        val dateOnlyFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        
+        fun parseDate(dateString: String): Long {
+            return try {
+                dateTimeFormat.parse(dateString)?.time ?: 0
+            } catch (e: Exception) {
+                // Fallback to date-only format
+                dateOnlyFormat.parse(dateString)?.time ?: 0
+            }
+        }
+        
         return try {
-            val fromDate = dateFormat.parse(fromDateString)?.time ?: 0
-            val untilDate = dateFormat.parse(untilDateString)?.time ?: 0
+            val fromDate = parseDate(fromDateString)
+            val untilDate = parseDate(untilDateString)
             val today = getCurrentTimeInMillis()
             today in fromDate..untilDate
         } catch (e: Exception) {
