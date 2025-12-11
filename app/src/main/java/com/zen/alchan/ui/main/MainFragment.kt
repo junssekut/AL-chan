@@ -17,6 +17,7 @@ import com.zen.alchan.ui.profile.ProfileFragment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import io.sentry.Sentry
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.concurrent.TimeUnit
@@ -112,7 +113,129 @@ class MainFragment : BaseFragment<FragmentMainBinding, MainViewModel>() {
             mainBottomNavigation.setOnItemReselectedListener {
                 sharedViewModel.scrollToTop(it.order)
             }
+
+            // Debug FAB for Sentry testing - REMOVE IN PRODUCTION
+            setupSentryDebugFab()
         }
+    }
+
+    /**
+     * Sets up the debug FAB for testing Sentry error tracking.
+     * This method generates various types of errors for Sentry exploration.
+     * REMOVE THIS IN PRODUCTION!
+     */
+    private fun setupSentryDebugFab() {
+        // First, let's capture some handled exceptions to test Sentry
+        triggerTestExceptions()
+
+        binding.sentryDebugFab.setOnClickListener {
+            // Show a dialog with crash options
+            val options = arrayOf(
+                "1. Capture handled exception",
+                "2. Capture custom message",
+                "3. Crash with NullPointerException",
+                "4. Crash with IllegalStateException",
+                "5. Crash with ArrayIndexOutOfBoundsException"
+            )
+
+            android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Sentry Debug Options")
+                .setItems(options) { _, which ->
+                    when (which) {
+                        0 -> captureHandledException()
+                        1 -> captureCustomMessage()
+                        2 -> crashWithNullPointer()
+                        3 -> crashWithIllegalState()
+                        4 -> crashWithArrayIndex()
+                    }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+    }
+
+    /**
+     * Triggers various test exceptions that are caught and sent to Sentry
+     */
+    private fun triggerTestExceptions() {
+        // Test 1: NumberFormatException
+        try {
+            val invalidNumber = "not_a_number".toInt()
+        } catch (e: NumberFormatException) {
+            Sentry.captureException(e)
+        }
+
+        // Test 2: Custom exception with message
+        try {
+            throw IllegalArgumentException("Test error: Invalid user configuration detected")
+        } catch (e: IllegalArgumentException) {
+            Sentry.captureException(e)
+        }
+
+        // Test 3: JSON parsing error simulation
+        try {
+            val jsonString = "{ invalid json }"
+            org.json.JSONObject(jsonString)
+        } catch (e: org.json.JSONException) {
+            Sentry.captureException(e)
+        }
+
+        // Test 4: Index out of bounds
+        try {
+            val list = listOf(1, 2, 3)
+            val item = list[10]
+        } catch (e: IndexOutOfBoundsException) {
+            Sentry.captureException(e)
+        }
+
+        // Test 5: Arithmetic exception
+        try {
+            val result = 10 / 0
+        } catch (e: ArithmeticException) {
+            Sentry.captureException(e)
+        }
+
+        // Send a custom message to Sentry
+        Sentry.captureMessage("Sentry debug test initialized - MainFragment loaded")
+    }
+
+    private fun captureHandledException() {
+        try {
+            throw RuntimeException("Test handled exception from debug FAB")
+        } catch (e: RuntimeException) {
+            Sentry.captureException(e)
+            android.widget.Toast.makeText(
+                requireContext(),
+                "Handled exception sent to Sentry!",
+                android.widget.Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun captureCustomMessage() {
+        Sentry.captureMessage("Custom debug message from AL-chan at ${System.currentTimeMillis()}")
+        android.widget.Toast.makeText(
+            requireContext(),
+            "Custom message sent to Sentry!",
+            android.widget.Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun crashWithNullPointer() {
+        // This will crash the app with NullPointerException
+        val nullString: String? = null
+        nullString!!.length
+    }
+
+    private fun crashWithIllegalState() {
+        // This will crash the app with IllegalStateException
+        throw IllegalStateException("Intentional crash for Sentry testing!")
+    }
+
+    private fun crashWithArrayIndex() {
+        // This will crash the app with ArrayIndexOutOfBoundsException
+        val array = arrayOf(1, 2, 3)
+        val crash = array[100]
     }
 
     override fun setUpObserver() {
