@@ -1,12 +1,12 @@
 pipeline {
-    agent {
-        dockerfile {
-            filename 'Dockerfile'
-            // Use the Dockerfile to build the agent environment
-            // This runs the entire pipeline inside the Docker container
-            reuseNode true
-        }
-    }
+    agent any
+    // Note: If Docker Pipeline plugin is available, you can use:
+    // agent {
+    //     dockerfile {
+    //         filename 'Dockerfile'
+    //         reuseNode true
+    //     }
+    // }
     
     parameters {
         choice(

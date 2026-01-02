@@ -1,21 +1,25 @@
 # Jenkins CI/CD Setup for AL-chan
 
-This document describes how to set up Jenkins for automated builds of the AL-chan Android application using Docker.
+This document describes how to set up Jenkins for automated builds of the AL-chan Android application.
 
 ## Prerequisites
 
 1. **Jenkins Server** with the following installed:
    - Jenkins 2.x or later
-   - Docker installed and running on the Jenkins host (required by Jenkins Docker plugin)
-   - Jenkins Docker plugin configured to communicate with Docker daemon
+   - Java Development Kit (JDK) 17 or later
+   - Android SDK (if building natively on Jenkins agent)
 
 2. **Required Jenkins Plugins**:
-   - Docker Pipeline Plugin (or Docker Plugin)
    - Git Plugin
    - Pipeline Plugin
    - Credentials Binding Plugin
 
-**Note:** The Jenkinsfile uses Jenkins' Docker agent functionality (`agent { dockerfile }`) which automatically handles Docker container management. This means Jenkins will build and run the pipeline inside the Docker container, eliminating the need for Docker CLI commands in the pipeline script.
+3. **Optional - For Docker-based builds**:
+   - Docker installed and running on the Jenkins host
+   - Docker Pipeline Plugin (or Docker Plugin)
+   - Then uncomment the Docker agent configuration in the Jenkinsfile
+
+**Note:** The Jenkinsfile currently uses `agent any` which runs on any available Jenkins agent. If you have the Docker Pipeline plugin installed, you can uncomment the `agent { dockerfile }` section in the Jenkinsfile to build inside a Docker container with all dependencies pre-configured.
 
 ## Setup Instructions
 
@@ -126,11 +130,11 @@ The Jenkinsfile defines the following stages:
 5. **Archive Artifacts**: Archive the generated APK/AAB files
 6. **Test Reports**: Collect and publish test results (if available)
 
-**Note:** The pipeline automatically runs inside a Docker container built from the `Dockerfile`. Jenkins' Docker plugin handles image building, container lifecycle, and cleanup automatically.
+**Note:** The pipeline currently runs on any available Jenkins agent (`agent any`). If you have the Docker Pipeline plugin installed, you can uncomment the Docker agent configuration in the Jenkinsfile to run the pipeline inside a Docker container.
 
-## Docker Build Environment
+## Docker Build Environment (Optional)
 
-The `Dockerfile` sets up a complete Android build environment with:
+If you enable the Docker agent in the Jenkinsfile, the `Dockerfile` sets up a complete Android build environment with:
 
 - OpenJDK 17
 - Android SDK Command Line Tools
@@ -139,7 +143,11 @@ The `Dockerfile` sets up a complete Android build environment with:
 - Build Tools 34.0.0
 - Gradle (via Gradle Wrapper)
 
-Jenkins automatically builds this Docker image and runs the entire pipeline inside a container based on it. The Docker plugin handles caching and reuse of the image across builds for efficiency.
+To enable Docker builds:
+1. Install the Docker Pipeline plugin in Jenkins
+2. Ensure Docker is available on the Jenkins host
+3. Uncomment the `agent { dockerfile }` section in the Jenkinsfile
+4. Comment out the `agent any` line
 
 ## Customization
 
@@ -193,9 +201,16 @@ environment {
 
 ## Troubleshooting
 
-### Docker Permission Issues
+### Invalid Agent Type Error
 
-The Jenkinsfile uses Jenkins' Docker plugin with the `agent { dockerfile }` directive. This requires:
+If you see an error like "Invalid agent type 'dockerfile' specified. Must be one of [any, label, none]":
+- This means the Docker Pipeline plugin is not installed in Jenkins
+- The Jenkinsfile has been updated to use `agent any` by default
+- If you want to use Docker builds, install the Docker Pipeline plugin and uncomment the Docker agent configuration in the Jenkinsfile
+
+### Docker Permission Issues (Optional - if using Docker agent)
+
+If you enable the Docker agent in the Jenkinsfile, you'll need:
 - Docker to be installed on the Jenkins host
 - Jenkins to have access to the Docker daemon (usually via `/var/run/docker.sock`)
 - Docker Pipeline plugin properly configured in Jenkins
@@ -205,12 +220,12 @@ If you see Docker-related errors, ensure:
 2. Jenkins can communicate with Docker daemon
 3. The Docker Pipeline plugin is installed in Jenkins
 
-### Docker Not Available
+### Android SDK Not Found
 
-If you see "docker: not found" errors:
-- Ensure Docker is installed on the Jenkins server (not inside Jenkins container if running Jenkins in Docker)
-- Verify Jenkins Docker plugin is installed and configured
-- Check Jenkins system configuration for Docker settings
+If you see "ANDROID_HOME not set" or similar errors:
+- Install Android SDK on the Jenkins agent
+- Set the `ANDROID_HOME` environment variable
+- Or use the Docker agent which includes a pre-configured Android SDK
 
 ### SDK License Issues
 
