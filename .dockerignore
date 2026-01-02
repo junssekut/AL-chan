@@ -1,0 +1,47 @@
+# Git files
+.git
+.gitignore
+.gitattributes
+
+# Build outputs
+app/build/
+build/
+*/build/
+.gradle/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local configuration
+local.properties
+keystore/
+*.keystore
+*.jks
+
+# Documentation
+docs/
+*.md
+!JENKINS_SETUP.md
+
+# Test outputs
+app/src/androidTest/
+app/src/test/
+
+# Temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# CI/CD (except the ones we need)
+.github/
+Jenkinsfile
+
+# Release artifacts
+*.apk
+*.aab
