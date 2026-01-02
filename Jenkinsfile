@@ -76,10 +76,24 @@ pipeline {
                     """
                     
                     // Create keystore directory if it doesn't exist
+                    // Create the folder
+                    sh 'mkdir -p keystore'
+                    
+                    // Generate a debug keystore if it doesn't exist
                     sh """
-                        mkdir -p keystore
                         if [ ! -f keystore/debug.keystore ]; then
-                            echo "Using default debug keystore from Android SDK"
+                            echo "Generating new debug keystore..."
+                            keytool -genkey -v \
+                                -keystore keystore/debug.keystore \
+                                -storepass android \
+                                -alias androiddebugkey \
+                                -keypass android \
+                                -keyalg RSA \
+                                -keysize 2048 \
+                                -validity 10000 \
+                                -dname "CN=Android Debug,O=Android,C=US"
+                        else
+                            echo "Keystore already exists."
                         fi
                     """
                 }
