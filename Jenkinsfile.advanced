@@ -49,11 +49,17 @@ properties([
 ])
 
 pipeline {
-    agent any
+    agent {
+        dockerfile {
+            filename 'Dockerfile'
+            // Use the Dockerfile to build the agent environment
+            // This runs the entire pipeline inside the Docker container
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            reuseNode true
+        }
+    }
     
     environment {
-        DOCKER_IMAGE = "alchan-android-build"
-        DOCKER_TAG = "${env.BUILD_ID}"
         APK_OUTPUT_DIR = "app/build/outputs/apk"
         AAB_OUTPUT_DIR = "app/build/outputs/bundle"
     }
@@ -80,18 +86,6 @@ pipeline {
                         branches: [[name: "*/${params.BRANCH}"]],
                         userRemoteConfigs: scm.userRemoteConfigs
                     ])
-                }
-            }
-        }
-        
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    echo "Building Docker image for Android build environment..."
-                    sh """
-                        docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
-                        docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest
-                    """
                 }
             }
         }
@@ -129,11 +123,7 @@ pipeline {
                     echo "Building with command: ${cleanCmd} ${buildCmd}"
                     
                     sh """
-                        docker run --rm \
-                            -v \$(pwd):/workspace \
-                            -w /workspace \
-                            ${DOCKER_IMAGE}:${DOCKER_TAG} \
-                            bash -c "./gradlew ${cleanCmd} ${buildCmd} --no-daemon --stacktrace"
+                        ./gradlew ${cleanCmd} ${buildCmd} --no-daemon --stacktrace
                     """
                 }
             }
@@ -216,14 +206,8 @@ pipeline {
         }
         always {
             script {
-                echo "Cleaning up Docker resources..."
-                // Clean up old Docker images (keep last 5)
-                sh """
-                    docker images ${DOCKER_IMAGE} --format "{{.Tag}}" | \
-                    grep -v latest | \
-                    tail -n +6 | \
-                    xargs -r -I {} docker rmi ${DOCKER_IMAGE}:{} || true
-                """
+                echo "Build completed. Workspace will be cleaned by Jenkins if configured."
+                // Note: Docker image cleanup is handled automatically by Jenkins Docker plugin
             }
         }
     }

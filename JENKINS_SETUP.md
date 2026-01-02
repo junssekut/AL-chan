@@ -6,18 +6,16 @@ This document describes how to set up Jenkins for automated builds of the AL-cha
 
 1. **Jenkins Server** with the following installed:
    - Jenkins 2.x or later
-   - Docker installed and running
-   - Jenkins user added to the Docker group:
-     ```bash
-     sudo usermod -aG docker jenkins
-     sudo systemctl restart jenkins
-     ```
+   - Docker installed and running on the Jenkins host (required by Jenkins Docker plugin)
+   - Jenkins Docker plugin configured to communicate with Docker daemon
 
 2. **Required Jenkins Plugins**:
-   - Docker Pipeline Plugin
+   - Docker Pipeline Plugin (or Docker Plugin)
    - Git Plugin
    - Pipeline Plugin
    - Credentials Binding Plugin
+
+**Note:** The Jenkinsfile uses Jenkins' Docker agent functionality (`agent { dockerfile }`) which automatically handles Docker container management. This means Jenkins will build and run the pipeline inside the Docker container, eliminating the need for Docker CLI commands in the pipeline script.
 
 ## Setup Instructions
 
@@ -123,11 +121,12 @@ The Jenkinsfile defines the following stages:
 
 1. **Preparation**: Display build parameters
 2. **Checkout**: Checkout the selected branch from Git
-3. **Build Docker Image**: Build the Android build environment Docker image
-4. **Setup Build Environment**: Create necessary configuration files
-5. **Build APK/AAB**: Execute the Gradle build command inside Docker
-6. **Archive Artifacts**: Archive the generated APK/AAB files
-7. **Test Reports**: Collect and publish test results (if available)
+3. **Setup Build Environment**: Create necessary configuration files (local.properties, keystore directory)
+4. **Build APK/AAB**: Execute the Gradle build command
+5. **Archive Artifacts**: Archive the generated APK/AAB files
+6. **Test Reports**: Collect and publish test results (if available)
+
+**Note:** The pipeline automatically runs inside a Docker container built from the `Dockerfile`. Jenkins' Docker plugin handles image building, container lifecycle, and cleanup automatically.
 
 ## Docker Build Environment
 
@@ -140,7 +139,7 @@ The `Dockerfile` sets up a complete Android build environment with:
 - Build Tools 34.0.0
 - Gradle (via Gradle Wrapper)
 
-The Docker image is built for each job and cached for subsequent builds.
+Jenkins automatically builds this Docker image and runs the entire pipeline inside a container based on it. The Docker plugin handles caching and reuse of the image across builds for efficiency.
 
 ## Customization
 
@@ -196,11 +195,22 @@ environment {
 
 ### Docker Permission Issues
 
-If Jenkins can't access Docker:
-```bash
-sudo usermod -aG docker jenkins
-sudo systemctl restart jenkins
-```
+The Jenkinsfile uses Jenkins' Docker plugin with the `agent { dockerfile }` directive. This requires:
+- Docker to be installed on the Jenkins host
+- Jenkins to have access to the Docker daemon (usually via `/var/run/docker.sock`)
+- Docker Pipeline plugin properly configured in Jenkins
+
+If you see Docker-related errors, ensure:
+1. Docker is installed and running on the Jenkins host
+2. Jenkins can communicate with Docker daemon
+3. The Docker Pipeline plugin is installed in Jenkins
+
+### Docker Not Available
+
+If you see "docker: not found" errors:
+- Ensure Docker is installed on the Jenkins server (not inside Jenkins container if running Jenkins in Docker)
+- Verify Jenkins Docker plugin is installed and configured
+- Check Jenkins system configuration for Docker settings
 
 ### SDK License Issues
 
@@ -245,7 +255,11 @@ RUN sdkmanager \
 
 ### Cleaning Up Old Builds
 
-Jenkins automatically cleans up old Docker images (keeps last 5). Adjust in the `post.always` block of the Jenkinsfile.
+Jenkins Docker plugin automatically manages Docker images created during builds. You can configure Jenkins to clean up old builds and their associated Docker images through:
+- Job configuration: "Discard Old Builds" setting
+- Jenkins global configuration: Docker settings for image cleanup
+
+Manual cleanup of Docker images can be done on the Jenkins host if needed.
 
 ## Support
 
