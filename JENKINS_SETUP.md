@@ -23,6 +23,20 @@ This document describes how to set up Jenkins for automated builds of the AL-cha
 
 ### 1. Configure Jenkins Job
 
+There are two Jenkinsfile options available:
+
+**Option A: Standard Jenkinsfile** (Recommended for most users)
+- Uses predefined branch list
+- Simple setup, no additional plugins required
+- File: `Jenkinsfile`
+
+**Option B: Advanced Jenkinsfile** (For advanced users)
+- Dynamic branch selection from Git repository
+- Requires "Active Choices" plugin
+- File: `Jenkinsfile.advanced`
+
+#### Setup Steps:
+
 1. Create a new **Pipeline** job in Jenkins
 2. In the job configuration:
    - **General**: Check "This project is parameterized" (parameters are defined in Jenkinsfile)
@@ -33,7 +47,7 @@ This document describes how to set up Jenkins for automated builds of the AL-cha
      - Repository URL: Your repository URL
      - Credentials: Add your Git credentials
      - Branch Specifier: `*/master` (or your default branch)
-     - Script Path: `Jenkinsfile`
+     - Script Path: `Jenkinsfile` (or `Jenkinsfile.advanced` for dynamic branches)
 
 ### 2. Build Parameters
 
@@ -132,6 +146,8 @@ The Docker image is built for each job and cached for subsequent builds.
 
 ### Adding More Branches
 
+**Method 1: Manual Update (Standard Jenkinsfile)**
+
 Edit the `Jenkinsfile` and add branches to the `BRANCH` parameter:
 
 ```groovy
@@ -141,6 +157,18 @@ choice(
     description: 'Select the branch to build'
 )
 ```
+
+**Method 2: Use the Helper Script**
+
+Run the included script to list available branches:
+
+```bash
+./scripts/list-branches.sh
+```
+
+**Method 3: Dynamic Branches (Advanced)**
+
+Use `Jenkinsfile.advanced` which automatically fetches all branches from the Git repository. Requires the "Active Choices" Jenkins plugin.
 
 ### Changing Build Variants
 
