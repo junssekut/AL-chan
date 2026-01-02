@@ -2,8 +2,6 @@
 // This requires the "Active Choices" plugin in Jenkins
 // For simpler setup, use the standard Jenkinsfile
 
-@Library('shared-library') _ // Optional: if you have a shared library
-
 properties([
     parameters([
         [
@@ -18,7 +16,7 @@ properties([
                 fallbackScript: [
                     classpath: [],
                     sandbox: false,
-                    script: 'return ["master"]'
+                    script: 'return ["main", "master"]'
                 ],
                 script: [
                     classpath: [],

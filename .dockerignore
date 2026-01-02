@@ -25,8 +25,8 @@ keystore/
 
 # Documentation
 docs/
-*.md
-!JENKINS_SETUP.md
+README.md
+LICENSE
 
 # Test outputs
 app/src/androidTest/
@@ -38,9 +38,8 @@ app/src/test/
 .DS_Store
 Thumbs.db
 
-# CI/CD (except the ones we need)
+# CI/CD
 .github/
-Jenkinsfile
 
 # Release artifacts
 *.apk

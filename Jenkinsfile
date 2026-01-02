@@ -4,7 +4,7 @@ pipeline {
     parameters {
         choice(
             name: 'BRANCH',
-            choices: ['master', 'develop', 'copilot/add-jenkinsfile-for-docker-integration'],
+            choices: ['master', 'develop'],
             description: 'Select the branch to build'
         )
         choice(
