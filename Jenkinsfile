@@ -4,7 +4,6 @@ pipeline {
             filename 'Dockerfile'
             // Use the Dockerfile to build the agent environment
             // This runs the entire pipeline inside the Docker container
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
             reuseNode true
         }
     }
