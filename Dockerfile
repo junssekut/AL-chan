@@ -1,5 +1,5 @@
 # Dockerfile for Android App Build Environment
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jdk
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
